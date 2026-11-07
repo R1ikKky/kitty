@@ -1,0 +1,151 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight, ArrowUpRight, CalendarDays, Cat, Check, ChevronLeft, ChevronRight, CircleHelp, Clock3, Dumbbell, Flame, Heart, Leaf, Pause, Play, RotateCcw, Settings2, Sparkles, Trophy, X } from "lucide-react";
+import { exerciseKey, storageKey, week } from "./plan";
+
+type Tab = "plan" | "progress" | "settings";
+type Saved = { name: string; done: string[] };
+const empty: Saved = { name: "", done: [] };
+const shortDate = (date: Date) => date.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+function mondayOf(date: Date) {
+  const monday = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  monday.setDate(monday.getDate() - (monday.getDay() + 6) % 7);
+  return monday;
+}
+function shifted(date: Date, days: number) { const copy = new Date(date); copy.setDate(copy.getDate() + days); return copy; }
+function dateKey(date: Date) { return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`; }
+
+function KittyArt() {
+  return <svg viewBox="0 0 330 230" fill="none" aria-hidden="true" className="kitty-art">
+    <ellipse cx="169" cy="197" rx="139" ry="17" fill="#cdbce6" />
+    <path d="M62 182h218l-24 27H36z" fill="#ad97ce" /><path d="m53 195 214 1" stroke="#c9b7e2" strokeWidth="2" />
+    <path d="M218 161c47 12 64-7 46-29-15-17-36-7-22 7" stroke="#f7f1e8" strokeWidth="18" strokeLinecap="round" />
+    <path d="M119 137c21-45 99-37 108 9l-8 37h-96z" fill="#f7f1e8" />
+    <path d="M163 143c22-21 43-10 49 15l-9 26h-60z" fill="#b69bdb" />
+    <path d="m146 155-33 29H83m111-23 22 23h29" stroke="#f7f1e8" strokeWidth="17" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="m102 112-5-46 29 23 26-1 23-24-1 50c4 38-67 44-72-2" fill="#f7f1e8" />
+    <path d="m104 79 4 22 11-10m42-11-14 12 16 9" fill="#e8bac9" />
+    <path d="m116 115 8 3m24-3-8 3m-9 10 3 2 3-2" stroke="#665078" strokeWidth="3" strokeLinecap="round" />
+    <path d="m111 127-23-5m23 13-21 5m68-13 23-5m-23 13 21 5" stroke="#ab94b8" strokeWidth="2" strokeLinecap="round" />
+    <path d="M62 152v23m-9-19v16m19-16v16m-19-8h19" stroke="#7c6597" strokeWidth="8" strokeLinecap="round" />
+    <path d="m242 65 4 12 12 4-12 4-4 12-4-12-12-4 12-4z" fill="#fff8e9" /><path d="m70 86 3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#b19acb" />
+    <path d="M278 179c-2-26 0-50 13-65m-12 39c-21-1-20-21-20-21 18 0 20 21 20 21m3-19c-3-21 13-28 13-28 7 20-13 28-13 28" stroke="#9d9d7b" strokeWidth="3" fill="#aeb191" strokeLinejoin="round" />
+    <path d="M266 174h27l-5 23h-16z" fill="#dfcfbc" />
+  </svg>;
+}
+
+export default function Home() {
+  const [tab, setTab] = useState<Tab>("plan");
+  const [selected, setSelected] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const [monday, setMonday] = useState(new Date(2026, 10, 2));
+  const [saved, setSaved] = useState<Saved>(empty);
+  const [ready, setReady] = useState(false);
+  const [storageError, setStorageError] = useState(false);
+  const [seconds, setSeconds] = useState(60);
+  const [running, setRunning] = useState(false);
+  const deadline = useRef(0);
+  const exerciseList = useRef<HTMLElement>(null);
+  const [help, setHelp] = useState(false);
+  const [started, setStarted] = useState(false);
+
+  useEffect(() => {
+    setMonday(mondayOf(new Date()));
+    try {
+      const raw: unknown = JSON.parse(localStorage.getItem(storageKey) ?? "null");
+      if (raw && typeof raw === "object" && "name" in raw && typeof raw.name === "string" && "done" in raw && Array.isArray(raw.done)) {
+        setSaved({ name: raw.name.slice(0, 40), done: raw.done.filter((item): item is string => typeof item === "string") });
+      }
+    } catch { setStorageError(true); }
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    try { localStorage.setItem(storageKey, JSON.stringify(saved)); }
+    catch { setStorageError(true); }
+  }, [saved, ready]);
+
+  useEffect(() => {
+    if (!running) return;
+    const interval = window.setInterval(() => {
+      const left = Math.max(0, Math.ceil((deadline.current - Date.now()) / 1000));
+      setSeconds(left);
+      if (!left) setRunning(false);
+    }, 200);
+    return () => window.clearInterval(interval);
+  }, [running]);
+
+  const startOfWeek = shifted(monday, offset * 7);
+  const weekId = dateKey(startOfWeek);
+  const day = week[selected];
+  const complete = (dayIndex: number) => week[dayIndex].exercises.filter((exercise) => saved.done.includes(exerciseKey(weekId, dayIndex, exercise.id))).length;
+  const completedDays = week.filter((item, index) => item.exercises.length > 0 && complete(index) === item.exercises.length).length;
+  const totalDone = week.reduce((sum, _, index) => sum + complete(index), 0);
+  const totalExercises = week.reduce((sum, item) => sum + item.exercises.length, 0);
+  const todayDone = complete(selected);
+  const percent = Math.round(totalDone / totalExercises * 100);
+  const toggleExercise = (id: string) => {
+    const key = exerciseKey(weekId, selected, id);
+    setSaved((previous) => ({ ...previous, done: previous.done.includes(key) ? previous.done.filter((item) => item !== key) : [...previous.done, key] }));
+  };
+  const toggleTimer = () => {
+    if (running) { setSeconds(Math.max(0, Math.ceil((deadline.current - Date.now()) / 1000))); setRunning(false); }
+    else { const duration = seconds || 60; setSeconds(duration); deadline.current = Date.now() + duration * 1000; setRunning(true); }
+  };
+  const selectDay = (index: number) => { setSelected(index); setStarted(false); };
+  const changeWeek = (direction: number) => { setOffset((value) => value + direction); setStarted(false); };
+
+  const nav = [
+    { id: "plan" as const, label: "Мой план", icon: CalendarDays },
+    { id: "progress" as const, label: "Мой прогресс", icon: Trophy },
+    { id: "settings" as const, label: "Настройки", icon: Settings2 },
+  ];
+
+  return <div className="app-shell">
+    <a href="#main" className="skip-link">К содержимому</a>
+    <aside className="sidebar">
+      <a className="brand" href="/" aria-label="Kitty — главная"><span className="brand-mark"><Cat size={27} strokeWidth={1.7} /></span>kitty<span className="brand-dot">.</span></a>
+      <div className="sidebar-caption">ТВОЁ МЕСТО СИЛЫ</div>
+      <nav className="nav-list" aria-label="Главная навигация">{nav.map(({ id, label, icon: Icon }) => <button key={id} onClick={() => setTab(id)} className={`nav-item ${tab === id ? "active" : ""}`} aria-current={tab === id ? "page" : undefined}><Icon size={19} /> <span>{label}</span>{tab === id && <span className="nav-dot" />}</button>)}</nav>
+      <div className="sidebar-note"><span className="note-heart"><Heart size={23} /></span><p>В своём темпе.<br />С любовью к себе.</p><span>Маленькие шаги тоже<br />ведут к большим переменам.</span></div>
+      <button className="help-button" onClick={() => setHelp(true)}><CircleHelp size={18} /> Как здесь всё устроено <ArrowUpRight size={15} /></button>
+      <div className="sidebar-profile"><span className="avatar"><Cat size={23} /></span><div><strong>{saved.name || "Это ты"}</strong><small>Главная героиня ♡</small></div><button aria-label="Открыть настройки профиля" onClick={() => setTab("settings")}><Settings2 size={17} /></button></div>
+    </aside>
+
+    <main id="main" className="main-content">
+      <header className="topbar"><span>Немного движения. Много заботы о себе.</span><div className="topbar-date"><span className="status-dot" /> Твой личный план <span className="mini-avatar"><Cat size={18} /></span></div></header>
+      <div className="page-content">
+        <div className="page-heading"><div><div className="eyebrow">LET’S FEEL GOOD</div><h1>{tab === "plan" ? `Твой ритм, ${saved.name || "твоя сила"}` : tab === "progress" ? "Твои маленькие победы" : "Всё по-твоему"}<span className="heading-spark">✳</span></h1><p>{tab === "plan" ? "Не нужно быть идеальной. Просто будь на своей стороне." : tab === "progress" ? "Каждое выполненное упражнение — уже шаг вперёд." : "Добавь немного себя в это уютное место."}</p></div><span className="plan-badge"><Sparkles size={15} /> Для тебя, с заботой</span></div>
+
+        {tab === "settings" ? <section className="panel settings-panel"><span className="section-kicker">ЛИЧНОЕ ПРОСТРАНСТВО</span><h2>Как к тебе обращаться?</h2><label htmlFor="name">Твоё имя</label><input id="name" value={saved.name} maxLength={40} placeholder="Например, Катя" onChange={(event) => setSaved((value) => ({ ...value, name: event.target.value }))} /><p className="muted">Имя и отметки упражнений сохраняются автоматически в этом браузере.</p><div className="settings-info"><Heart size={19} /><p>Это первый макет с примером расписания. Его можно заменить твоим планом и любимыми упражнениями.</p></div><button className="primary-button" onClick={() => setTab("plan")}>Вернуться к плану <ArrowRight size={17} /></button></section> : <>
+          <section className="week-section" aria-label="Расписание недели"><div className="section-heading"><h2>Твоя неделя <span>3 тренировки · 4 дня для себя</span></h2><div className="week-navigation"><button aria-label="Предыдущая неделя" onClick={() => changeWeek(-1)}><ChevronLeft size={17} /></button><span>{shortDate(startOfWeek)} — {shortDate(shifted(startOfWeek, 6))}</span><button aria-label="Следующая неделя" onClick={() => changeWeek(1)}><ChevronRight size={17} /></button>{offset !== 0 && <button className="current-week" onClick={() => { setOffset(0); setStarted(false); }}>Эта неделя</button>}</div></div><div className="week-grid">{week.map((item, index) => {
+            const isComplete = item.exercises.length > 0 && complete(index) === item.exercises.length;
+            return <button key={item.day} onClick={() => { selectDay(index); setTab("plan"); }} className={`day-card ${selected === index ? "selected" : ""} ${item.exercises.length ? "training-day" : "rest-day"}`} aria-pressed={selected === index}><span className="day-top">{item.day}<span>{shifted(startOfWeek, index).getDate()}</span></span><span className="day-icon">{isComplete ? <Check size={20} /> : item.exercises.length ? <Dumbbell size={21} /> : <Leaf size={21} />}</span><strong>{item.label}</strong><span className="day-status">{isComplete ? "Готово, умница!" : item.exercises.length ? `${item.minutes} минут` : index === 5 ? "Свежий воздух" : "Восстановление"}</span></button>;
+          })}</div></section>
+
+          {tab === "progress" ? <section className="progress-view panel"><span className="section-kicker">НЕДЕЛЯ В ЦИФРАХ</span><h2>Твой вклад в себя</h2><div className="progress-stats"><div><Trophy /><strong>{completedDays}<small> / 3</small></strong><span>тренировки завершены</span></div><div><Dumbbell /><strong>{totalDone}<small> / {totalExercises}</small></strong><span>упражнений выполнено</span></div><div><Heart /><strong>{percent}<small>%</small></strong><span>недельного плана</span></div></div><div className="progress-track"><span style={{ width: `${percent}%` }} /></div><p className="muted">{totalDone ? "Красиво идёшь! Продолжай в комфортном для себя ритме." : "Твои победы появятся здесь, когда отметишь первое упражнение."}</p><button className="primary-button" onClick={() => setTab("plan")}>К тренировке <ArrowRight size={17} /></button></section> : <div className="content-grid"><div className="workout-column">
+            <section className="hero-card"><div className="hero-copy"><span className="hero-label"><span />{day.category}</span><h2>{day.title}</h2><p>{day.exercises.length ? "Почувствуй опору. Найди свой ритм.\nЭто время — только для тебя." : "Отдых — тоже часть пути.\nПобудь в своём ритме и набери сил."}</p><div className="hero-meta"><span><Clock3 size={15} />{day.minutes ? `${day.minutes} минут` : "Без спешки"}</span><span>{day.exercises.length ? <Dumbbell size={15} /> : <Leaf size={15} />}{day.exercises.length ? `${day.exercises.length} упражнения` : "Время для себя"}</span></div>{day.exercises.length > 0 && <button className="primary-button" disabled={!ready} onClick={() => { setStarted(true); exerciseList.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>{todayDone === day.exercises.length ? "Посмотреть результат" : started ? "Продолжить тренировку" : "Начать тренировку"}<ArrowRight size={17} /></button>}</div><KittyArt /><span className="hero-corner">a little stronger, a little happier</span></section>
+
+            <section ref={exerciseList} className="exercise-section" aria-label="Упражнения"><div className="section-heading"><h2>{day.exercises.length ? "Твоя тренировка" : "План на сегодня"}</h2>{day.exercises.length > 0 && <span className="exercise-count">{todayDone} из {day.exercises.length} выполнено</span>}</div>{day.exercises.length ? <><div className="warmup-note"><Flame size={18} /><span>Сначала — немного разминки</span><span className="warmup-time">5–7 мин</span></div><div className="exercise-table-header"><span>УПРАЖНЕНИЕ</span><span>ПОДХОДЫ</span><span>ПОВТОРЫ</span><span className="sr-only">Выполнено</span></div><div className="exercise-list">{day.exercises.map((exercise, index) => {
+              const checked = saved.done.includes(exerciseKey(weekId, selected, exercise.id));
+              return <article className={`exercise-row ${checked ? "completed" : ""}`} key={exercise.id}><div className={`exercise-thumbnail thumb-${index}`}><Dumbbell size={24} strokeWidth={1.5} /><span>{String(index + 1).padStart(2, "0")}</span></div><div className="exercise-description"><h3>{exercise.name}</h3><p>{exercise.detail}</p></div><span className="exercise-value"><span className="mobile-label">Подходы</span>{exercise.sets}</span><span className="exercise-value"><span className="mobile-label">Повторы</span>{exercise.reps}</span><button className="exercise-check" disabled={!ready} aria-label={`${checked ? "Снять отметку" : "Отметить выполненным"}: ${exercise.name}`} aria-pressed={checked} onClick={() => toggleExercise(exercise.id)}>{checked && <Check size={18} />}</button></article>;
+            })}</div><div className={`finish-note ${todayDone === day.exercises.length ? "all-done" : ""}`} role="status">{todayDone === day.exercises.length ? <><Trophy size={18} /> Всё получилось! Эта маленькая победа — твоя ♡</> : <><Heart size={16} /> Заверши тренировку спокойной заминкой и похвали себя.</>}</div></> : <div className="rest-panel panel"><Leaf size={32} /><h3>{selected === 5 ? "Выйди на небольшую прогулку" : "Сегодня можно замедлиться"}</h3><p>{selected === 5 ? "Выбери приятный маршрут и комфортный темп. Наушники и любимый плейлист — по желанию." : "Выспаться, прогуляться или просто отдохнуть. Никаких галочек — ты заслуживаешь заботы каждый день."}</p><button className="text-button" onClick={() => { if (selected >= 4) changeWeek(1); selectDay(selected < 4 ? (selected < 2 ? 2 : 4) : 0); }}>Посмотреть следующую тренировку <ArrowRight size={16} /></button></div>}</section>
+          </div><aside className="right-column"><section className="panel weekly-progress"><div className="section-heading"><h2>Маленькие победы</h2><Trophy size={19} /></div><div className="progress-ring" style={{ background: `conic-gradient(var(--purple) ${percent}%, #f0edf4 0)` }}><div><strong>{completedDays}<span>/ 3</span></strong><small>тренировки</small></div></div><p>{totalDone ? "Ты уже ближе к своей цели" : "Всё начинается с одного шага"}</p><div className="progress-footer"><span>Прогресс недели</span><strong>{percent}%</strong></div><div className="progress-track"><span style={{ width: `${percent}%` }} /></div><button className="text-button" onClick={() => setTab("progress")}>Смотреть прогресс <ArrowUpRight size={16} /></button></section>
+          <section className="panel timer-panel"><div className="section-heading"><h2><Clock3 size={18} /> Время выдохнуть</h2><span className="tiny-label">ОТДЫХ</span></div><div className="timer-display" role="timer" aria-label={`Осталось ${seconds} секунд`}>{String(Math.floor(seconds / 60)).padStart(2, "0")}<span>:</span>{String(seconds % 60).padStart(2, "0")}</div><div className="timer-presets">{[30, 60, 90].map((value) => <button key={value} aria-pressed={!running && seconds === value} className={!running && seconds === value ? "chosen" : ""} onClick={() => { setRunning(false); setSeconds(value); }}>{value} сек</button>)}</div><div className="timer-controls"><button className="timer-start" onClick={toggleTimer}>{running ? <Pause size={15} /> : <Play size={15} />}{running ? "Пауза" : seconds === 0 ? "Ещё раз" : "Начать отдых"}</button><button className="timer-reset" aria-label="Сбросить таймер" onClick={() => { setRunning(false); setSeconds(60); }}><RotateCcw size={17} /></button></div><p role="status" aria-live="polite">{seconds === 0 ? "Время вышло. Продолжай, когда будешь готова." : "Между подходами можно не спешить."}</p></section>
+          <div className="quote-card"><span>“</span><p>Ты становишься сильнее<br />каждый раз, когда<br /><em>выбираешь себя.</em></p><Heart size={16} /></div></aside></div>}
+        </>}
+        <footer className="page-footer"><span><Cat size={15} /> Сделано с заботой о тебе</span><span>{storageError ? "Не удалось сохранить данные. Проверь настройки браузера." : "Твой прогресс сохраняется в этом браузере"}</span></footer>
+      </div>
+    </main>
+    <nav className="mobile-nav" aria-label="Мобильная навигация">{nav.map(({ id, label, icon: Icon }) => <button key={id} className={tab === id ? "active" : ""} onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined}><Icon size={21} /><span>{label}</span></button>)}</nav>
+    {help && <div className="modal-backdrop" onClick={() => setHelp(false)}><HelpDialog onClose={() => setHelp(false)} /></div>}
+  </div>;
+}
+
+function HelpDialog({ onClose }: { onClose: () => void }) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => { const dialog = dialogRef.current; dialog?.showModal(); return () => dialog?.close(); }, []);
+  return <dialog ref={dialogRef} className="help-dialog" aria-labelledby="help-title" onCancel={onClose} onClick={(event) => event.stopPropagation()}><button className="close-dialog" onClick={onClose} aria-label="Закрыть"><X size={20} /></button><span className="brand-mark"><Cat size={28} /></span><h2 id="help-title">Твоё место силы</h2><p>Выбери день недели, открой тренировку и отмечай выполненные упражнения кружком справа.</p><p>Таймер поможет засечь отдых между подходами. Раздел «Мой прогресс» покажет результат выбранной недели.</p><p className="muted">Пока здесь пример плана. Отметки и имя хранятся только в этом браузере, без синхронизации между устройствами.</p><button className="primary-button" onClick={onClose}>Всё понятно <Heart size={16} /></button></dialog>;
+}

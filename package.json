@@ -1,0 +1,15 @@
+{
+  "name": "kitty-training-plan",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["apps/*"],
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "npm run dev --workspace @kitty/web",
+    "dev:api": "npm run build --workspace @kitty/api && npm run start --workspace @kitty/api",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "start": "npm run start --workspace @kitty/web"
+  },
+  "devDependencies": { "typescript": "5.9.3", "@types/node": "22.19.19" }
+}

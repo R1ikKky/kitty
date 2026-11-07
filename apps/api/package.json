@@ -1,0 +1,6 @@
+{
+  "name": "@kitty/api", "version": "0.1.0", "private": true,
+  "scripts": { "build": "tsc", "start": "node dist/main.js", "typecheck": "tsc --noEmit" },
+  "dependencies": { "@nestjs/common": "11.1.21", "@nestjs/core": "11.1.21", "@nestjs/platform-express": "11.1.21", "pg": "8.20.0", "reflect-metadata": "0.2.2", "rxjs": "7.8.2" },
+  "devDependencies": { "@types/pg": "8.20.0" }
+}
