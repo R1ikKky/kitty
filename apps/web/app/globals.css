@@ -95,6 +95,7 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
 .finish-note { margin-top: 16px; color: #ac9fb6; font-size: 9px; display: flex; gap: 7px; align-items: center; line-height: 1.6; }
 .finish-note.all-done { background: #eeebf5; color: #80669c; padding: 12px; border-radius: 8px; }
 .right-column { display: grid; gap: 18px; }
+.content-grid > *, .right-column > * { min-width: 0; }
 .panel { padding: 22px 21px; background: #fff; border: 1px solid #ede9f0; border-radius: 14px; }
 .weekly-progress .section-heading h2 { font-size: 12px; }
 .weekly-progress .section-heading > svg { color: #b7a0ce; }
@@ -117,7 +118,7 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
 .tiny-label { font-size: 7px; letter-spacing: 1px; color: #b9aabd; }
 .timer-display { text-align: center; font-size: 45px; font-weight: 400; color: #83738f; letter-spacing: 3px; font-variant-numeric: tabular-nums; margin: 21px 0 14px; line-height: 1.2; }
 .timer-display > span { color: #c4b7cf; padding: 0 2px; }
-.timer-presets { display: flex; justify-content: center; gap: 7px; }
+.timer-presets { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
 .timer-presets button { padding: 6px 10px; border: 1px solid #ede8f2; background: #fff; border-radius: 5px; color: #b1a5bc; font-size: 9px; }
 .timer-presets button.chosen, .timer-presets button:hover { background: #f0eaf7; border-color: #e4d8f0; color: #9273b1; }
 .timer-controls { display: flex; gap: 7px; margin-top: 20px; }
@@ -214,7 +215,7 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
 }
 @media (max-width: 1000px) {
   .content-grid { grid-template-columns: 1fr; }
-  .right-column { display: grid; grid-template-columns: 1fr 1fr; }
+  .right-column { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero-copy { max-width: 65%; }
   .kitty-art { width: 45%; right: 0; bottom: 25px; }
   .day-card strong { font-size: 10px; }
@@ -253,7 +254,7 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
   .finish-note svg { margin-top: 3px; }
   .warmup-note { font-size: 12px; padding: 14px; }
   .timer-panel h2, .weekly-progress .section-heading h2 { font-size: 15px; }
-  .timer-presets button { min-height: 44px; padding-inline: 18px; font-size: 12px; }
+  .timer-presets button { min-height: 44px; min-width: 0; padding-inline: 8px; font-size: 12px; }
   .timer-start, .timer-reset { min-height: 48px; font-size: 13px; }
   .timer-reset { min-width: 48px; }
   .timer-panel > p, .weekly-progress > p, .progress-footer { font-size: 12px; }
@@ -270,7 +271,7 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
   .week-section > .section-heading { flex-direction: column; align-items: stretch; gap: 12px; }
   .week-navigation { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 5px; text-align: center; }
   .week-navigation > span { font-size: 13px; }
-  .week-navigation .current-week { grid-column: 1 / -1; justify-self: center; height: 36px; }
+  .week-navigation .current-week { grid-column: 1 / -1; justify-self: center; height: 44px; }
   .week-grid { gap: 5px; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 12px 0 24px; padding: 2px; }
   .day-card { min-height: 100px; padding: 10px 2px; align-items: center; border-radius: 10px; }
   .day-top { flex-direction: column; align-items: center; gap: 6px; font-size: 11px; }
