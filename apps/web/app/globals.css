@@ -26,8 +26,7 @@ svg { flex-shrink: 0; }
 .brand { display: flex; align-items: center; gap: 9px; font-size: 37px; font-weight: 750; letter-spacing: -2px; padding-left: 10px; }
 .brand-mark { width: 41px; height: 41px; display: inline-flex; align-items: center; justify-content: center; background: #eee7f7; color: var(--purple); border-radius: 13px; }
 .brand-dot { color: var(--purple); margin-left: -9px; }
-.sidebar-caption { margin: 19px 0 43px 12px; font-size: 9px; letter-spacing: 2.1px; color: #a39ba9; }
-.nav-list { display: grid; gap: 9px; }
+.nav-list { margin-top: 38px; display: grid; gap: 9px; }
 .nav-item { display: flex; align-items: center; gap: 12px; width: 100%; padding: 15px 15px; background: transparent; color: #8a8492; border-radius: 11px; text-align: left; font-size: 13px; }
 .nav-item:hover { background: #f8f5fb; }
 .nav-item.active { background: #f0eaf8; color: #795e9f; font-weight: bold; }
@@ -64,13 +63,11 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
 .hero-label { display: inline-flex; align-items: center; gap: 6px; font-size: 9px; color: #8f75a7; background: #f7f2fc99; border: 1px solid #d8c9e5; padding: 6px 9px; border-radius: 5px; }
 .hero-label > span { width: 4px; height: 4px; border-radius: 50%; background: #aa8cbf; }
 .hero-copy h2 { font-size: clamp(24px, 2.4vw, 34px); font-weight: 500; color: #564268; line-height: 1.2; letter-spacing: -.9px; margin-top: 15px; }
-.hero-copy > p { white-space: pre-line; color: #9a86ab; font-size: 11px; line-height: 1.85; margin-top: 11px; }
 .hero-meta { display: flex; flex-wrap: wrap; gap: 16px; margin: 15px 0 20px; color: #8d77a0; font-size: 10px; }
 .hero-meta > span { display: flex; align-items: center; gap: 6px; }
 .primary-button { display: inline-flex; align-items: center; justify-content: center; gap: 19px; background: var(--purple); color: #fff; border-radius: 8px; padding: 12px 17px; font-size: 11px; min-height: 41px; }
 .primary-button:hover { background: #6d5096; }
 .kitty-art { position: absolute; width: 48%; max-width: 340px; right: -6px; bottom: 24px; }
-.hero-corner { position: absolute; right: 27px; bottom: 16px; font-size: 8px; color: #ae9cbd; letter-spacing: .2px; }
 .exercise-section { margin-top: 28px; scroll-margin-top: 25px; }
 .exercise-count { color: #a396ae; font-size: 10px; }
 .warmup-note { margin-top: 17px; padding: 12px 14px; background: #f4eee7; color: #aa947d; border: 1px solid #eee5da; border-radius: 9px; display: flex; align-items: center; gap: 9px; font-size: 10px; }
@@ -128,11 +125,6 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
 .timer-start:hover { background: #e5d9f1; }
 .timer-reset { background: #fff; border: 1px solid #eee7f3; border-radius: 6px; padding: 8px; color: #ac99bc; display: grid; place-items: center; }
 .timer-panel > p { text-align: center; margin-top: 13px; color: #b1a7b8; font-size: 8px; line-height: 1.7; }
-.quote-card { padding: 2px 12px 5px 20px; position: relative; color: #9a8c9f; }
-.quote-card > span { font-family: Georgia, serif; font-size: 56px; color: #d4c6df; line-height: 1; }
-.quote-card > p { font-size: 14px; line-height: 1.8; margin-top: -14px; }
-.quote-card em { font-family: Georgia, serif; font-weight: normal; color: #a08ab5; font-style: italic; }
-.quote-card > svg { color: #c4b3d0; margin-top: 15px; }
 .rest-panel { margin-top: 18px; text-align: center; padding: 35px; }
 .rest-panel > svg { margin: auto auto 16px; color: #a6b08e; }
 .rest-panel h3 { font-weight: 500; font-size: 19px; }
@@ -202,7 +194,6 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
   .page-content { padding-top: 46px; }
   .hero-card { min-height: 300px; }
   .hero-copy { padding: 32px; }
-  .hero-copy > p { font-size: 12px; }
   .hero-meta { margin-bottom: 25px; }
   .exercise-row { padding-top: 20px; padding-bottom: 20px; }
 }
@@ -219,13 +210,11 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
   .exercise-description p { font-size: 8px; }
   .hero-copy { padding: 23px; max-width: 72%; }
   .kitty-art { width: 45%; right: -25px; bottom: 36px; }
-  .hero-corner { font-size: 7px; right: 17px; }
   .panel { padding-inline: 17px; }
 }
 @media (max-width: 1000px) {
   .content-grid { grid-template-columns: 1fr; }
   .right-column { display: grid; grid-template-columns: 1fr 1fr; }
-  .quote-card { display: none; }
   .hero-copy { max-width: 65%; }
   .kitty-art { width: 45%; right: 0; bottom: 25px; }
   .day-card strong { font-size: 10px; }
@@ -252,7 +241,6 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
   .day-status { white-space: normal; overflow-wrap: anywhere; }
   .day-top > span, .day-status { font-size: 10px; }
   .primary-button { min-height: 48px; font-size: 14px; }
-  .hero-copy > p { font-size: 14px; }
   .hero-label, .hero-meta { font-size: 12px; }
   .exercise-description h3 { font-size: 14px; }
   .exercise-description p { font-size: 12px; line-height: 1.6; color: #91839d; }
@@ -295,10 +283,9 @@ h1 { font-size: clamp(26px, 2.4vw, 36px); font-weight: 500; letter-spacing: -1.1
   .hero-card { min-height: 0; border-radius: 16px; }
   .hero-copy { max-width: none; padding: 23px 21px; }
   .hero-copy h2 { font-size: clamp(26px, 7vw, 34px); margin-top: 17px; overflow-wrap: anywhere; }
-  .hero-copy > p { font-size: 13px; line-height: 1.8; }
   .hero-meta { gap: 16px; margin: 18px 0 22px; }
   .hero-copy .primary-button { width: 100%; }
-  .kitty-art, .hero-corner { display: none; }
+  .kitty-art { display: none; }
   .exercise-section { margin-top: 25px; scroll-margin-top: 18px; }
   .exercise-section > .section-heading { flex-wrap: wrap; gap: 8px 12px; }
   .exercise-count { font-size: 12px; }
