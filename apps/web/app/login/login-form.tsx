@@ -19,23 +19,23 @@ export default function LoginForm() {
         body: JSON.stringify({ password }),
       });
       if (response.ok) { window.location.replace("/"); return; }
-      setError(response.status === 429 ? "Слишком много попыток. Попробуй через минуту." : "Пароль не подошёл. Попробуй ещё раз.");
+      setError(response.status === 429 ? "слишком много попыток. попробуй через минуту." : "пароль не подошёл. попробуй ещё раз.");
       setPassword("");
-    } catch { setError("Не удалось связаться с сайтом. Попробуй ещё раз."); }
+    } catch { setError("не удалось связаться с сайтом. попробуй ещё раз."); }
     setPending(false);
   }
 
   return <main className="login-screen"><section className="login-card" aria-labelledby="login-title">
     <span className="brand-mark login-mark"><Cat size={35} strokeWidth={1.5} /></span>
-    <span className="section-kicker">ТВОЁ МЕСТО СИЛЫ</span>
-    <h1 id="login-title">Привет, Варя <Heart size={24} /></h1>
-    <p>Немного времени только для тебя.<br />Введи пароль, чтобы открыть свой план.</p>
+    <span className="section-kicker">твоё место силы</span>
+    <h1 id="login-title">приветик, варичка <Heart size={24} /></h1>
+    <p>немного времени только для тебя.<br />введи пароль, чтобы открыть свой план.</p>
     <form onSubmit={submit}>
-      <label htmlFor="password">Пароль</label>
+      <label htmlFor="password">пароль</label>
       <div className="password-field"><LockKeyhole size={18} /><input id="password" name="password" type="password" inputMode="numeric" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required maxLength={32} autoFocus aria-invalid={Boolean(error)} aria-describedby={error ? "login-error" : undefined} /></div>
       <div className="login-error" id="login-error" role="status" aria-live="polite">{error}</div>
-      <button className="primary-button" type="submit" disabled={pending || !password}>{pending ? "Открываем…" : "Войти в своё пространство"}<ArrowRight size={17} /></button>
+      <button className="primary-button" type="submit" disabled={pending || !password}>{pending ? "открываем…" : "войти в своё пространство"}<ArrowRight size={17} /></button>
     </form>
-    <span className="login-footnote">С любовью к себе. В своём темпе.</span>
+    <span className="login-footnote">с любовью к себе. в своём темпе.</span>
   </section></main>;
 }

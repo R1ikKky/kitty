@@ -10,6 +10,7 @@
     "build": "npm run build --workspaces",
     "typecheck": "npm run typecheck --workspaces",
     "test:auth": "node --experimental-strip-types --test tests/auth.test.mjs",
+    "test:calendar": "node --experimental-strip-types --test tests/calendar.test.mjs",
     "start": "npm run start --workspace @kitty/web"
   },
   "devDependencies": { "typescript": "5.9.3", "@types/node": "22.19.19" }
