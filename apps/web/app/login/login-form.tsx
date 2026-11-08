@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { ArrowRight, Cat, Heart, LockKeyhole } from "lucide-react";
+import { ArrowRight, Cat, LockKeyhole } from "lucide-react";
 
 export default function LoginForm() {
   const [password, setPassword] = useState("");
@@ -25,17 +25,22 @@ export default function LoginForm() {
     setPending(false);
   }
 
-  return <main className="login-screen"><section className="login-card" aria-labelledby="login-title">
-    <span className="brand-mark login-mark"><Cat size={35} strokeWidth={1.5} /></span>
-    <span className="section-kicker">твоё место силы</span>
-    <h1 id="login-title">приветик, варичка <Heart size={24} /></h1>
-    <p>немного времени только для тебя.<br />введи пароль, чтобы открыть свой план.</p>
+  return <main className="login-screen">
+    <aside className="login-cover" aria-hidden="true">
+      <span className="login-cover-stamp"><Cat size={31} strokeWidth={1.25} /></span>
+      <svg className="login-ribbon" viewBox="0 0 500 650" fill="none"><path d="M420-80C115 90 102 260 290 320c215 68 63 287-210 410" stroke="currentColor" strokeWidth="68" /><path d="M420-80C115 90 102 260 290 320c215 68 63 287-210 410" stroke="#f1dfd9" strokeWidth="1" /><path d="M465-55C160 115 147 285 335 345c215 68 63 287-210 410" stroke="#815c60" strokeWidth="1" /></svg>
+      <span className="login-cover-wordmark">kitty<span>.</span></span>
+    </aside>
+    <section className="login-card" aria-labelledby="login-title">
+    <a href="/" className="login-brand" aria-label="kitty"><Cat size={22} strokeWidth={1.5} /> kitty.</a>
+    <span className="section-kicker">вход</span>
+    <h1 id="login-title">приветик,<br /><em>варичка</em></h1>
+    <p>введи пароль, чтобы открыть план тренировок.</p>
     <form onSubmit={submit}>
       <label htmlFor="password">пароль</label>
-      <div className="password-field"><LockKeyhole size={18} /><input id="password" name="password" type="password" inputMode="numeric" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required maxLength={32} autoFocus aria-invalid={Boolean(error)} aria-describedby={error ? "login-error" : undefined} /></div>
+      <div className="password-field"><LockKeyhole size={18} /><input id="password" name="password" type="password" inputMode="numeric" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required maxLength={32} aria-invalid={Boolean(error)} aria-describedby={error ? "login-error" : undefined} /></div>
       <div className="login-error" id="login-error" role="status" aria-live="polite">{error}</div>
-      <button className="primary-button" type="submit" disabled={pending || !password}>{pending ? "открываем…" : "войти в своё пространство"}<ArrowRight size={17} /></button>
+      <button className="primary-button" type="submit" disabled={pending || !password}>{pending ? "открываем…" : "войти"}<ArrowRight size={17} /></button>
     </form>
-    <span className="login-footnote">с любовью к себе. в своём темпе.</span>
   </section></main>;
 }
