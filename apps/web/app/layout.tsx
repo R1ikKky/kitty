@@ -4,7 +4,7 @@ import "./globals.css";
 export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const metadata: Metadata = {
-  title: "kitty — твой ритм, твоя сила",
+  title: "kitty",
   description: "личный план тренировок: расписание недели, упражнения и маленькие победы каждый день.",
 };
 
