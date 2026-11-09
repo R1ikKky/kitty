@@ -1,18 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import { usePathname } from "next/navigation";
 
 type Action = "idle" | "running" | "jumping";
 
 export default function KittyCompanion() {
-  const pathname = usePathname();
-  const [position, setPosition] = useState(0.2);
+  const [position, setPosition] = useState({ x: 0.2, y: 0.75 });
   const [direction, setDirection] = useState(1);
   const [action, setAction] = useState<Action>("idle");
   const [reaction, setReaction] = useState(0);
   const [meow, setMeow] = useState(false);
-  const positionRef = useRef(0.2);
+  const positionRef = useRef({ x: 0.2, y: 0.75 });
   const reactionUntil = useRef(0);
   const reducedMotion = useRef(true);
   const actionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -23,10 +21,11 @@ export default function KittyCompanion() {
 
   const roam = useCallback(() => {
     if (reducedMotion.current || document.hidden || Date.now() < reactionUntil.current) return;
+    if (document.activeElement?.matches("input, textarea, select, .kitty-pet:focus-visible")) return;
     clearAction();
     const current = positionRef.current;
-    const next = current < 0.5 ? 0.65 + Math.random() * 0.3 : 0.05 + Math.random() * 0.3;
-    setDirection(next > current ? 1 : -1);
+    const next = { x: current.x < 0.5 ? 0.65 + Math.random() * 0.3 : 0.05 + Math.random() * 0.3, y: 0.03 + Math.random() * 0.94 };
+    setDirection(next.x > current.x ? 1 : -1);
     positionRef.current = next;
     setPosition(next);
     setMeow(false);
@@ -35,7 +34,7 @@ export default function KittyCompanion() {
       setAction("jumping");
       setReaction((count) => count + 1);
       actionTimer.current = setTimeout(() => setAction("idle"), 700);
-    }, 2200);
+    }, 1500);
   }, [clearAction]);
 
   useEffect(() => {
@@ -48,10 +47,12 @@ export default function KittyCompanion() {
     };
     updatePreference();
     preference.addEventListener("change", updatePreference);
-    const interval = setInterval(roam, 8000);
+    const firstRun = setTimeout(roam, 100);
+    const interval = setInterval(roam, 2400);
     const onVisibilityChange = () => { if (document.hidden) { clearAction(); setAction("idle"); setMeow(false); } };
     document.addEventListener("visibilitychange", onVisibilityChange);
     return () => {
+      clearTimeout(firstRun);
       clearInterval(interval);
       clearAction();
       preference.removeEventListener("change", updatePreference);
@@ -68,7 +69,7 @@ export default function KittyCompanion() {
     actionTimer.current = setTimeout(() => { setAction("idle"); setMeow(false); }, 1100);
   }
 
-  return <div className="kitty-companion" data-login={pathname === "/login" || undefined} data-action={action} data-petted={meow || undefined} style={{ "--kitty-position": position } as CSSProperties}>
+  return <div className="kitty-companion" data-action={action} data-petted={meow || undefined} style={{ "--kitty-x": position.x, "--kitty-y": position.y } as CSSProperties}>
     <span className="kitty-meow" role="status" aria-live="polite">{meow ? "мяу" : ""}</span>
     <button type="button" className="kitty-pet" aria-label="погладить котика" title="погладить котика" onClick={petKitty}>
       <span className="kitty-shadow" aria-hidden="true" />

@@ -347,8 +347,7 @@ svg { flex-shrink: 0; }
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
 
-.kitty-companion { --kitty-edge: 258px; position: fixed; bottom: 15px; left: calc(var(--kitty-edge) + (100vw - 40px - var(--kitty-edge)) * var(--kitty-position)); transform: translateX(-50%); width: 76px; height: 66px; z-index: 35; pointer-events: none; transition: left 2.2s cubic-bezier(.4, 0, .25, 1); }
-.kitty-companion[data-login] { --kitty-edge: 55vw; top: calc(44px + env(safe-area-inset-top)); bottom: auto; }
+.kitty-companion { --kitty-ceiling: calc(40px + env(safe-area-inset-top)); --kitty-floor: calc(16px + env(safe-area-inset-bottom)); position: fixed; top: calc(var(--kitty-ceiling) + (100dvh - var(--kitty-ceiling) - var(--kitty-floor) - 66px) * var(--kitty-y)); left: calc(40px + env(safe-area-inset-left) + (100vw - 80px - env(safe-area-inset-left) - env(safe-area-inset-right)) * var(--kitty-x)); transform: translateX(-50%); width: 76px; height: 66px; z-index: 35; pointer-events: none; transition: left 1.5s cubic-bezier(.35, 0, .25, 1), top 1.5s cubic-bezier(.35, 0, .25, 1); }
 .kitty-pet { position: relative; display: block; width: 76px; height: 66px; padding: 0; background: transparent; pointer-events: auto; touch-action: manipulation; border-radius: 50%; }
 .kitty-pet:not(:disabled):active { transform: none; }
 .kitty-pet:focus-visible { outline: 2px dashed var(--rose); outline-offset: 3px; }
@@ -358,15 +357,14 @@ svg { flex-shrink: 0; }
 .kitty-tail { transform-box: fill-box; transform-origin: 95% 90%; animation: kitty-tail 3s ease-in-out infinite; }
 .kitty-eyes { transform-box: fill-box; transform-origin: center; animation: kitty-blink 6s infinite; }
 .kitty-front-leg, .kitty-back-leg { transform-box: fill-box; transform-origin: 50% 0; }
-[data-action="running"] .kitty-front-leg { animation: kitty-step .24s ease-in-out infinite alternate; }
-[data-action="running"] .kitty-back-leg { animation: kitty-step .24s ease-in-out infinite alternate-reverse; }
-[data-action="running"] .kitty-jump { animation: kitty-trot .24s ease-in-out infinite alternate; }
+[data-action="running"] .kitty-front-leg { animation: kitty-step .18s ease-in-out infinite alternate; }
+[data-action="running"] .kitty-back-leg { animation: kitty-step .18s ease-in-out infinite alternate-reverse; }
+[data-action="running"] .kitty-jump { animation: kitty-trot .18s ease-in-out infinite alternate; }
 [data-action="jumping"] .kitty-jump { animation: kitty-hop .7s cubic-bezier(.25, .6, .45, 1) both; }
 [data-action="jumping"] .kitty-shadow { animation: kitty-shadow .7s ease both; }
 [data-petted] .kitty-tail { animation: kitty-tail .18s ease-in-out infinite alternate; }
 .kitty-meow { position: absolute; left: 27px; bottom: calc(100% + 13px); min-width: 43px; padding: 3px 7px; color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 6px; text-align: center; font: 11px/1.5 var(--mono); opacity: 0; transition: opacity .15s; }
 [data-petted] .kitty-meow { opacity: 1; }
-[data-login] .kitty-meow { top: calc(100% + 3px); bottom: auto; }
 body:has(.password-field input:focus) .kitty-companion { visibility: hidden; }
 @keyframes kitty-tail { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(10deg); } }
 @keyframes kitty-blink { 0%, 44%, 48%, 100% { transform: scaleY(1); } 46% { transform: scaleY(.1); } }
@@ -374,6 +372,5 @@ body:has(.password-field input:focus) .kitty-companion { visibility: hidden; }
 @keyframes kitty-trot { from { transform: translateY(0); } to { transform: translateY(-3px); } }
 @keyframes kitty-hop { 0%, 100% { transform: translateY(0) rotate(0); } 18% { transform: translateY(2px) scaleY(.88); } 50% { transform: translateY(-30px) rotate(-5deg); } 80% { transform: translateY(0) scaleY(.92); } }
 @keyframes kitty-shadow { 50% { transform: scale(.65); opacity: .4; } }
-@media (max-width: 1200px) { .kitty-companion { --kitty-edge: 220px; } .kitty-companion[data-login] { --kitty-edge: 55vw; } }
-@media (max-width: 800px) { .kitty-companion { --kitty-edge: 40px; bottom: calc(81px + env(safe-area-inset-bottom)); } .page-content { padding-bottom: calc(165px + env(safe-area-inset-bottom)); } }
+@media (max-width: 800px) { .kitty-companion { --kitty-floor: calc(82px + env(safe-area-inset-bottom)); } }
 @media (prefers-reduced-motion: reduce) { .kitty-companion { transition: none; } .kitty-companion *, .kitty-companion *::before, .kitty-companion *::after { animation: none !important; transition: none !important; } }
